@@ -1,0 +1,20 @@
+{
+  "checked": "2026-10-03",
+  "source": "https://developers.flodesk.com/",
+  "apiVersion": "1.0.0",
+  "openapi": "3.0.3",
+  "referenceDocumentSha256": "d58d011cb68c2fa774e259961c233e1d2b4ceeaa9736e6d1f7432cb9ea8886f1",
+  "sanitizedSnapshotSha256": "a0ba15480a4101d901197268b5fffa14042540da3cc987125f319b41fc6aa478",
+  "publicMetadataSha256": "7b9cf705ee960cd5b081e65ae42af23ecaea2df885999144566f05f3fb037e52",
+  "nativePlatformOperations": 26,
+  "upstreamPlatformOperations": 26,
+  "examples": "Provider examples removed; internal JSON-pointer request refs expanded without network or vendor execution.",
+  "normalizations": [
+    "API docs describe subscriber identity alternatives and 50-member native upsert caps without structural required/maxItems; local semantic checks enforce them.",
+    "Positive page and positive per_page<=100 are enforced locally; native workflows perPage has an explicit local100 cap.",
+    "statuses serialized as documented CSV, preserving perPage and campaign query capitalization.",
+    "Native DELETE segment-removal JSON body retained; legacy helper dropped it.",
+    "All native request bodies require an explicit nonempty local input; no email send/schedule endpoint is invented."
+  ],
+  "scope": "All26 current public v1 REST operations. Official35-tool production MCP has separate analytics, cohort filters, archive/unarchive/CSV export and two-minute single-use confirmation tokens, not public REST routes."
+}

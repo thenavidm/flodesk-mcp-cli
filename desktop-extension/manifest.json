@@ -1,0 +1,122 @@
+{
+  "manifest_version": "0.2",
+  "name": "flodesk",
+  "display_name": "Flodesk MCP Server & CLI",
+  "version": "2.0.0",
+  "description": "Flodesk shared MCP and task CLI for current subscribers, native batch upserts, draft campaigns, workflows, custom fields, webhooks and exact reviewed account work.",
+  "long_description": "Shared native subscriber/draft/workflow/custom-field/webhook tasks with mandatory local approval and exact account-profile review. Official OAuth analytics/cohort MCP remains separate.",
+  "author": {
+    "name": "Navid Moazzez",
+    "url": "https://navid.me"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/thenavidm/flodesk-mcp-cli"
+  },
+  "homepage": "https://navid.me/mcp-servers/flodesk",
+  "documentation": "https://github.com/thenavidm/flodesk-mcp-cli/blob/main/INSTALL.md",
+  "support": "https://github.com/thenavidm/flodesk-mcp-cli/issues",
+  "license": "AGPL-3.0",
+  "keywords": [
+    "mcp",
+    "mcp-server",
+    "model-context-protocol",
+    "cli",
+    "command-line-tool",
+    "flodesk",
+    "email-marketing",
+    "subscriber-management",
+    "segments",
+    "native-batch-upsert",
+    "email-drafts",
+    "webhooks",
+    "custom-fields",
+    "workflow-automation",
+    "codex",
+    "claude-code",
+    "claude-desktop",
+    "cursor",
+    "ai-agents",
+    "typescript",
+    "desktop-extension",
+    "private-accounts",
+    "json",
+    "mutation-approval",
+    "write-safety",
+    "gemini-cli",
+    "windsurf",
+    "open-source",
+    "read-only",
+    "schema-validation"
+  ],
+  "server": {
+    "type": "node",
+    "entry_point": "server/index.js",
+    "mcp_config": {
+      "command": "node",
+      "args": [
+        "${__dirname}/server/index.js"
+      ],
+      "env": {
+        "FLODESK_API_KEY": "${user_config.api_key}",
+        "FLODESK_TOKEN_FILE": "${user_config.token_file}",
+        "FLODESK_READ_ONLY": "${user_config.read_only}",
+        "FLODESK_ALLOW_DESTRUCTIVE": "${user_config.allow_destructive}",
+        "FLODESK_ACCESS_TOKEN": "${user_config.access_token}",
+        "FLODESK_AUTH_TYPE": "${user_config.auth_type}"
+      }
+    }
+  },
+  "user_config": {
+    "token_file": {
+      "type": "string",
+      "title": "Private token-only file",
+      "description": "Absolute private token-only file. Select oauth in the authentication-type field only for a partner Bearer token; otherwise it defaults to an API key.",
+      "required": false
+    },
+    "read_only": {
+      "type": "boolean",
+      "title": "Read only",
+      "description": "Hide and directly refuse mutations and private output file writes.",
+      "default": false,
+      "required": false
+    },
+    "api_key": {
+      "type": "string",
+      "title": "Private account API key",
+      "description": "Flodesk private integration key, HTTP Basic with an empty password. Choose this OR the optional OAuth access token, never both.",
+      "required": false,
+      "sensitive": true
+    },
+    "allow_destructive": {
+      "type": "boolean",
+      "title": "Allow confirmed mutations",
+      "description": "Permit mutation execution only when the tool call explicitly confirms the exact action. Disable to refuse all mutations.",
+      "default": true,
+      "required": false
+    },
+    "access_token": {
+      "type": "string",
+      "title": "External OAuth access token (optional)",
+      "description": "Use this OR an API key, never both. Partner tokens expire; this bundle does not sign in or refresh them.",
+      "sensitive": true,
+      "required": false
+    },
+    "auth_type": {
+      "type": "string",
+      "title": "Token-file authentication type (optional)",
+      "description": "Enter oauth only when the selected token file contains a partner Bearer token; otherwise leave blank for API key.",
+      "required": false
+    }
+  },
+  "compatibility": {
+    "platforms": [
+      "darwin",
+      "win32",
+      "linux"
+    ],
+    "runtimes": {
+      "node": ">=22"
+    }
+  }
+}

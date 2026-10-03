@@ -1,0 +1,3 @@
+# Agents
+
+Follow the actual Bluesky/correct Firefly repo and full CMS blueprint. Reuse unchanged house CLI/server/guard and native argument schemas. Preserve AGPL/private history. Current 26 native REST routes are distinct from official 35-tool analytics/cohort MCP with real previews/single-use tokens. Keep Basic/Bearer/file profiles isolated, no refresh/import/retries. Retain DELETE body, native cases/statuses/batch caps, partial HTTP 200 handling and exact ordered local review. Never invent send/schedule/private hosted routes or claim cohort ownership/count/generation/token outcomes without evidence. Complete topics/keywords/tags/changelog/npm/desktop/all clients/full argument reference and 20 accordion FAQs.

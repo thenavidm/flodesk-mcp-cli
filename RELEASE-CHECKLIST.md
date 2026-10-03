@@ -1,0 +1,3 @@
+# Release-Checklist
+
+Verify current primary API/production MCP and pinned community source. Build/typecheck/test, actual 32/16 discovery and direct guards, native request fixtures and real Codex registration. Check full house repo/all arguments/20accordion FAQs/native assets. Scan source/history/npm/desktop, audit production, match version/manifest/tag/changelog/keywords/topics. Require seven source/tag Linux/macOS/Windows Node 22/24+desktop CI jobs. Fresh anonymous npm named/latest and downloaded desktop installs/discovery must pass. Publish full native CMS row, preserve indexing/publication, read back/revalidate/live check. Track authenticated provider/GUI/Codex task/token/site deployment gaps separately; catalogue programme is incomplete while pending.
