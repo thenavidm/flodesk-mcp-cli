@@ -93,7 +93,7 @@ flodesk-cli schema batch-create-or-update-subscribers
 flodesk-cli login
 ```
 
-Node 22+ for manual CLI/local MCP. [INSTALL.md](INSTALL.md) has Codex first and full client/OS setup, including the versioned [desktop bundle](https://github.com/thenavidm/flodesk-mcp-cli/releases/download/v2.0.0/flodesk-2.0.0.mcpb).
+Node 22+ for manual CLI/local MCP. [INSTALL.md](INSTALL.md) has Codex first and full client/OS setup, including the versioned [desktop bundle](https://github.com/thenavidm/flodesk-mcp-cli/releases/download/v2.0.1/flodesk-2.0.1.mcpb).
 
 ## 3. Set up Flodesk access
 
@@ -1427,7 +1427,7 @@ Build criterion: useful repeatable terminal/local-stdio access to native public 
 
 | Component | Reviewed version |
 | --- | --- |
-| Package/desktop manifest | 2.0.0 |
+| Package/desktop manifest | 2.0.1 |
 | Node runtime | >=22 |
 | MCP SDK | 1.32.0 |
 | Ajv / formats | 8.20.0 / 3.0.1 |

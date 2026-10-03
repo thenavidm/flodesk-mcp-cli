@@ -6,7 +6,7 @@ One npm package includes both binaries and all **32 tools**. Requires Node.js 22
 | --- | --- | --- |
 | Terminal | flodesk-cli | Scripts and agents with a shell |
 | Local MCP | flodesk-mcp | AI clients supporting stdio |
-| Desktop archive | flodesk-2.0.0.mcpb | Compatible Claude Desktop custom extensions |
+| Desktop archive | flodesk-2.0.1.mcpb | Compatible Claude Desktop custom extensions |
 | Flodesk-hosted alternative | https://flodesk.com/mcp | Official remote provider-hosted access |
 
 ## Contents
@@ -107,7 +107,7 @@ Account credentials must reach the server through private environment settings. 
 [mcp_servers.flodesk]
 command = "npx"
 args = ["-y", "@thenavidm/flodesk-mcp-cli@latest"]
-env_vars = ["FLODESK_API_KEY", "FLODESK_TOKEN_FILE", "FLODESK_ACCOUNTS", "FLODESK_DEFAULT_ACCOUNT", "FLODESK_READ_ONLY", "FLODESK_ALLOW_DESTRUCTIVE"]
+env_vars = ["FLODESK_API_KEY", "FLODESK_ACCESS_TOKEN", "FLODESK_TOKEN_FILE", "FLODESK_AUTH_TYPE", "FLODESK_ACCOUNTS", "FLODESK_DEFAULT_ACCOUNT", "FLODESK_READ_ONLY", "FLODESK_ALLOW_DESTRUCTIVE"]
 ~~~
 
 `env_vars` forwards those names from the environment available to Codex. If that environment does not contain them, configure private env settings locally. Codex can also call the CLI directly with SKILL.md and `--agent` output.
@@ -129,10 +129,10 @@ Alternatively install the CLI, make SKILL.md available to Claude, and use shell 
 
 ### Install the .mcpb extension
 
-1. Download `flodesk-2.0.0.mcpb` from [GitHub Releases](https://github.com/thenavidm/flodesk-mcp-cli/releases/latest).
+1. Download `flodesk-2.0.1.mcpb` from [GitHub Releases](https://github.com/thenavidm/flodesk-mcp-cli/releases/latest).
 2. In a supported Claude Desktop build, open **Settings > Extensions > Advanced settings > Install Extension…** and select it.
-3. Enter a private API key in the sensitive setting, or an absolute private token-file path. Leave the unused credential method empty. Requests use Authorization: Bearer at the fixed Flodesk endpoint. Use the intended account API key; named profiles are configured separately in private client environments.
-4. Enable read-only if you want only the 22 read operations. Reconnect and ask for account verification.
+3. Enter a private API key in the sensitive setting, or an absolute private token-file path. Leave the unused credential method empty. API-key requests use HTTP Basic with the key as username and an empty password. Externally minted OAuth access tokens use Bearer; select the matching auth type for a token file. Use the intended account API key; named profiles are configured separately in private client environments.
+4. Enable read-only if you want only the 16 read operations. Reconnect and ask for account verification.
 
 The bundle includes production dependencies and no credentials. Use a regular private token-only file if you prefer file-based credentials. The manifest requires Node 22 or newer from a compatible host. Organization policy may restrict custom extensions. Manual bundle updates require installing the new version; no automatic directory updates are promised. GUI installation remains unverified separately from archive/protocol checks.
 
