@@ -2,7 +2,7 @@
   "manifest_version": "0.2",
   "name": "flodesk",
   "display_name": "Flodesk MCP Server & CLI",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Flodesk shared MCP and task CLI for current subscribers, native batch upserts, draft campaigns, workflows, custom fields, webhooks and exact reviewed account work.",
   "long_description": "Shared native subscriber/draft/workflow/custom-field/webhook tasks with mandatory local approval and exact account-profile review. Official OAuth analytics/cohort MCP remains separate.",
   "author": {

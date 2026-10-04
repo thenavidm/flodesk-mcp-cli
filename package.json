@@ -1,12 +1,13 @@
 {
   "name": "@thenavidm/flodesk-mcp-cli",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Flodesk shared MCP and task CLI for current subscribers, native batch upserts, draft campaigns, workflows, custom fields, webhooks and exact reviewed account work.",
   "type": "module",
   "main": "./dist/index.js",
   "bin": {
     "flodesk-mcp": "dist/index.js",
-    "flodesk-cli": "dist/index.js"
+    "flodesk-cli": "dist/index.js",
+    "flodesk-mcp-cli": "dist/npx.js"
   },
   "engines": {
     "node": ">=22"
