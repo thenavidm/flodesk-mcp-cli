@@ -138,7 +138,7 @@ export function createApp(options: AppOptions = {}) {
     settings: [
       { env: "FLODESK_API_KEY", description: "Private account API key, sent as Basic auth.", secret: true },
       { env: "FLODESK_ACCESS_TOKEN", description: "An external OAuth Bearer token, in place of the key.", secret: true },
-      { env: "FLODESK_AUTH_TYPE", description: "basic or bearer: how the key or token is sent." },
+      { env: "FLODESK_AUTH_TYPE", description: "api_key or oauth: what the key or token file holds; api_key when unset." },
       { env: "FLODESK_TOKEN_FILE", description: "Owner-only file holding the key or token." },
       { env: "FLODESK_ACCOUNTS", description: "Named isolated API key or OAuth profiles.", secret: true },
       { env: "FLODESK_DEFAULT_ACCOUNT", description: "The profile a call uses when it names none.", tuning: true },
