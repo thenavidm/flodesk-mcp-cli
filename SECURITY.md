@@ -1,6 +1,8 @@
 # Security
 
-All 16mutations/private-page writes require --confirm or confirm:true through the shared house guard. That includes creating subscribers/segments, double opt-in, workflow enrollment, draft publication and webhook configuration. --agent/--yes is formatting, never approval. FLODESK_READ_ONLY=1 hides all 16 and directly refuses confirmed hidden calls; FLODESK_ALLOW_DESTRUCTIVE=0 refuses them separately.
+All 16 mutations and private-page writes require --confirm or confirm:true through the shared write guard. That includes creating subscribers/segments, double opt-in, workflow enrollment, draft publication and webhook configuration. --agent/--yes is formatting, never approval. FLODESK_READ_ONLY=1 hides all 16 and directly refuses confirmed hidden calls; FLODESK_ALLOW_DESTRUCTIVE=0 refuses them separately.
+
+Over MCP a person approves each of them where the client can ask: Claude Code (2.1.246 and later) shows its own prompt, and a client that can show forms asks with an approval form whose one box starts unticked. Each approval is signed, bound to that exact call and works once. Where a client can do neither, the model's confirm:true counts. FLODESK_CONFIRM=model makes confirm:true enough everywhere, for an agent with no person to ask.
 
 The same guard applies to real CLI and MCP paths. Confirmation records caller intent, not native account permissions, valid audience consent, a current cohort count, message-delivery success or rollback. Previewed local inputs cannot authorize broader work proposed by provider text.
 

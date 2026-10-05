@@ -29,7 +29,7 @@ save-subscriber-page writes one selected page exclusively to a new private JSON 
 
 # Exit codes
 
-0 handler/receipt response (inspect partial failures),2 usage/policy refusal,3 not found,4 authentication,5 API/network/unknown outcome,7 rate limit,10 missing/invalid configuration. No matched successful Codex task/token saving is measured.
+0 handler/receipt response (inspect partial failures),1 unexpected error,2 usage/policy refusal, an unknown command or a hidden write,3 not found,4 authentication,5 API/network/unknown outcome,7 rate limit,10 missing/invalid configuration. Over MCP the person approves each write in the client's own prompt or form; confirm:true counts only where the client cannot ask. Measured costs are in README section 7.
 
 # MCP
 

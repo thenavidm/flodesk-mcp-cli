@@ -11,7 +11,7 @@
 
 Flodesk MCP server and CLI for Codex and AI agents. 32 shared tools for current subscribers, draft campaigns, workflows, custom fields and webhooks, private account profiles and exact reviewed subscriber batches.
 
-One package provides a task CLI, local stdio MCP and versioned desktop bundle. Built and maintained by [Navid Moazzez](https://navid.me?utm_source=github&utm_medium=referral&utm_campaign=flodesk-mcp-cli&utm_content=readme). Complete setup: [navid.me](https://navid.me/mcp-servers/flodesk?utm_source=github&utm_medium=referral&utm_campaign=flodesk-mcp-cli&utm_content=guide).
+One package provides a task CLI, local stdio MCP and versioned desktop bundle. Built and maintained by [Navid Moazzez](https://navid.me?utm_source=github&utm_medium=referral&utm_campaign=flodesk-mcp-cli&utm_content=readme). Built on [Slipway](https://github.com/thenavidm/slipway), which turns one definition of each tool into the MCP server and the CLI. Complete setup: [navid.me](https://navid.me/mcp-servers/flodesk?utm_source=github&utm_medium=referral&utm_campaign=flodesk-mcp-cli&utm_content=guide).
 
 <img src="https://cdn.navid.me/repos/flodesk-mcp-cli-retina.gif" alt="Illustrated Flodesk workflow using the shared navid.me terminal" width="520">
 
@@ -177,7 +177,7 @@ flodesk-cli schema publish-studio-email
 
 | Flag | Behavior |
 | --- | --- |
-| --agent | Compact JSON/no input/color; never approval |
+| --agent | Compact JSON and no prompts; never confirms a write |
 | --confirm | Explicit requested-operation approval |
 | --account LABEL | Exact private key/token profile |
 | --select a,b.c | Local field selection |
@@ -190,7 +190,8 @@ flodesk-cli schema publish-studio-email
 | Exit | Meaning |
 | --- | --- |
 |0|Handler/receipt success; still inspect partial native failures|
-|2|Invalid arguments or refused/unapproved operation|
+|1|Unexpected error|
+|2|Invalid arguments, a refused or unapproved operation, an unknown command or a hidden write|
 |3|Not found|
 |4|Auth/permission|
 |5|API/network/unknown write outcome|
@@ -200,16 +201,27 @@ flodesk-cli schema publish-studio-email
 
 ## 7. MCP or CLI and token cost
 
-Both surfaces use the exact same real tool catalogue, handlers, argument validation and WriteGuard. CLI discovery/task-specific help can expose only requested command information; MCP clients determine their own discovery/loading strategy. No statement here assumes every client sends every schema on every turn.
+Both surfaces are built by [Slipway](https://github.com/thenavidm/slipway) from the exact same real tool catalogue, handlers, argument validation and write guard. CLI discovery/task-specific help can expose only requested command information; MCP clients determine their own discovery/loading strategy. No statement here assumes every client sends every schema on every turn.
 
-Fresh matched successful **Codex** MCP-versus-CLI task measurements remain pending. Publish actual API-reported usage with client/version/model/date, equivalent successful task/output/permissions and measured latency/provider calls. Tool-list characters, fixtures, another service's numbers or another client's historic results cannot establish token savings. Claude Code measurements are optional separate follow-up and never a prerequisite for Codex or this release.
+Measured on 2026-10-05 against 2.0.2, with Claude Code 2.1.286 on Claude Opus 5.5 (one short prompt with and without the server connected, the difference read from the API's own usage figures) and Codex 0.159.3 on gpt-6.1-sol:
+
+| Cost | 2.0.2 | 3.0.0 |
+| --- | --- | --- |
+| Claude Code, every tool loaded, every message | 13,410 | 12,750 |
+| Claude Code's default, tool search, every message | 949 | 950 |
+| `SKILL.md`, read once | 1,232 | 1,289 |
+| Codex over the CLI, one task, median of five | 126,029 | 82,830 |
+| Codex over MCP, the same task, median of five | 48,151 | 48,158 |
+
+The task was "find the command that adds a subscriber to a segment, and the flags it requires". Every tool loaded costs less because a subscriber batch and the double opt-in switch, each written out twice as their own arguments and inside `payload`, are now written once and referred to. Over the CLI, four of five 2.0.2 runs tried a command that failed, a bare `schema` or one that does not exist, then read the whole command list, because 2.0.2's help never said how to list commands; every extra step carries the whole conversation forward. Every 3.0.0 run asked `which` and read one command's help. Over MCP, Codex prints its own TypeScript rendering of the tool list and keeps its first and last 20,000 characters or so: the whole rendering is 182 tokens shorter on 3.0.0, but the part Codex keeps holds about 43 more, which each later request carries. `SKILL.md` costs 57 more because it now says how approval works over MCP and lists every exit code.
 
 | Evidence | Current status |
 | --- | --- |
 | Actual shared full/read-only discovery | Verified release checks |
 | Local mutation/read-only/account/partial-request behavior | Verified fixtures, no provider side effects |
-| Matched successful Codex task/token comparison | Pending; no percentage claimed |
-| Official hosted authenticated task comparison | Pending; documentation scope only |
+| Official hosted authenticated task comparison | Not measured; documentation scope only |
+
+Tool-list bytes or characters divided by four are not API usage, and no other offering was measured.
 
 
 ## 8. Every tool and argument
@@ -245,7 +257,7 @@ Kind: **Confirmed operation**. Native account permissions and local semantics st
 | `page_id` | No; body/guard requirements still apply | string | Native field; use the reviewed provider reference. |
 | `campaign_id` | No; body/guard requirements still apply | string | Native field; use the reviewed provider reference. |
 | `account` | No; body/guard requirements still apply | string | Exact configured private account profile label; not a tenant or provider account ID. |
-| `confirm` | No; body/guard requirements still apply | boolean | Must be true for the requested mutation or exclusive private output file. |
+| `confirm` | No; body/guard requirements still apply | boolean | Set true only when the user asked for exactly this action. |
 | `payload` | No; body/guard requirements still apply | object | Complete native JSON body; do not mix with body flags or payload_file. Arrays use repeated JSON object flags or a whole native array in a private file. |
 | `payload_file` | No; body/guard requirements still apply | string | Absolute regular non-symlink JSON body file, at most 1 MiB. Cannot mix with payload/body flags. minLength: `1`. |
 
@@ -282,7 +294,7 @@ Kind: **Confirmed operation**. Native account permissions and local semantics st
 | `campaign_id` | No; body/guard requirements still apply | string | Native field; use the reviewed provider reference. |
 | `asset_id` | No; body/guard requirements still apply | string | Native field; use the reviewed provider reference. |
 | `account` | No; body/guard requirements still apply | string | Exact configured private account profile label; not a tenant or provider account ID. |
-| `confirm` | No; body/guard requirements still apply | boolean | Must be true for the requested mutation or exclusive private output file. |
+| `confirm` | No; body/guard requirements still apply | boolean | Set true only when the user asked for exactly this action. |
 | `payload` | No; body/guard requirements still apply | object | Complete native JSON body; do not mix with body flags or payload_file. Arrays use repeated JSON object flags or a whole native array in a private file. |
 | `payload_file` | No; body/guard requirements still apply | string | Absolute regular non-symlink JSON body file, at most 1 MiB. Cannot mix with payload/body flags. minLength: `1`. |
 
@@ -317,7 +329,7 @@ Kind: **Confirmed operation**. Native account permissions and local semantics st
 | --- | --- | --- | --- |
 | `label` | No; body/guard requirements still apply | string | A friendly display label of the custom field. |
 | `account` | No; body/guard requirements still apply | string | Exact configured private account profile label; not a tenant or provider account ID. |
-| `confirm` | No; body/guard requirements still apply | boolean | Must be true for the requested mutation or exclusive private output file. |
+| `confirm` | No; body/guard requirements still apply | boolean | Set true only when the user asked for exactly this action. |
 | `payload` | No; body/guard requirements still apply | object | Complete native JSON body; do not mix with body flags or payload_file. Arrays use repeated JSON object flags or a whole native array in a private file. |
 | `payload_file` | No; body/guard requirements still apply | string | Absolute regular non-symlink JSON body file, at most 1 MiB. Cannot mix with payload/body flags. minLength: `1`. |
 
@@ -360,7 +372,7 @@ Kind: **Confirmed operation**. Native account permissions and local semantics st
 | `name` | No; body/guard requirements still apply | string | Native field; use the reviewed provider reference. |
 | `color` | No; body/guard requirements still apply | string | The color of the segment using a hex code. `Use GET List all segment colors`. to view available colors. |
 | `account` | No; body/guard requirements still apply | string | Exact configured private account profile label; not a tenant or provider account ID. |
-| `confirm` | No; body/guard requirements still apply | boolean | Must be true for the requested mutation or exclusive private output file. |
+| `confirm` | No; body/guard requirements still apply | boolean | Set true only when the user asked for exactly this action. |
 | `payload` | No; body/guard requirements still apply | object | Complete native JSON body; do not mix with body flags or payload_file. Arrays use repeated JSON object flags or a whole native array in a private file. |
 | `payload_file` | No; body/guard requirements still apply | string | Absolute regular non-symlink JSON body file, at most 1 MiB. Cannot mix with payload/body flags. minLength: `1`. |
 
@@ -424,7 +436,7 @@ Kind: **Confirmed operation**. Native account permissions and local semantics st
 | `optin_ip` | No; body/guard requirements still apply | string | IP address from which the subscriber confirmed their opt-in. |
 | `optin_timestamp` | No; body/guard requirements still apply | string | The date and time the subscribers confirmed their opt-in in ISO 8601 format. E.g. `2023-01-02T15:04:05.999Z`. |
 | `account` | No; body/guard requirements still apply | string | Exact configured private account profile label; not a tenant or provider account ID. |
-| `confirm` | No; body/guard requirements still apply | boolean | Must be true for the requested mutation or exclusive private output file. |
+| `confirm` | No; body/guard requirements still apply | boolean | Set true only when the user asked for exactly this action. |
 | `payload` | No; body/guard requirements still apply | object | Complete native JSON body; do not mix with body flags or payload_file. Arrays use repeated JSON object flags or a whole native array in a private file. |
 | `payload_file` | No; body/guard requirements still apply | string | Absolute regular non-symlink JSON body file, at most 1 MiB. Cannot mix with payload/body flags. minLength: `1`. |
 
@@ -480,7 +492,7 @@ Kind: **Confirmed operation**. Native account permissions and local semantics st
 | --- | --- | --- | --- |
 | `subscribers` | No; body/guard requirements still apply | array | List of subscribers to create or update. Maximum 50 items. |
 | `account` | No; body/guard requirements still apply | string | Exact configured private account profile label; not a tenant or provider account ID. |
-| `confirm` | No; body/guard requirements still apply | boolean | Must be true for the requested mutation or exclusive private output file. |
+| `confirm` | No; body/guard requirements still apply | boolean | Set true only when the user asked for exactly this action. |
 | `payload` | No; body/guard requirements still apply | object | Complete native JSON body; do not mix with body flags or payload_file. Arrays use repeated JSON object flags or a whole native array in a private file. |
 | `payload_file` | No; body/guard requirements still apply | string | Absolute regular non-symlink JSON body file, at most 1 MiB. Cannot mix with payload/body flags. minLength: `1`. |
 
@@ -574,7 +586,7 @@ Kind: **Confirmed operation**. Native account permissions and local semantics st
 | `id_or_email` | Yes | string | Exact native path parameter. minLength: `1`. |
 | `segment_ids` | No; body/guard requirements still apply | array | An array of identifiers of the segments. |
 | `account` | No; body/guard requirements still apply | string | Exact configured private account profile label; not a tenant or provider account ID. |
-| `confirm` | No; body/guard requirements still apply | boolean | Must be true for the requested mutation or exclusive private output file. |
+| `confirm` | No; body/guard requirements still apply | boolean | Set true only when the user asked for exactly this action. |
 | `payload` | No; body/guard requirements still apply | object | Complete native JSON body; do not mix with body flags or payload_file. Arrays use repeated JSON object flags or a whole native array in a private file. |
 | `payload_file` | No; body/guard requirements still apply | string | Absolute regular non-symlink JSON body file, at most 1 MiB. Cannot mix with payload/body flags. minLength: `1`. |
 
@@ -609,7 +621,7 @@ Kind: **Confirmed operation**. Native account permissions and local semantics st
 | `id_or_email` | Yes | string | Exact native path parameter. minLength: `1`. |
 | `segment_ids` | No; body/guard requirements still apply | array | An array of identifiers of the segments. |
 | `account` | No; body/guard requirements still apply | string | Exact configured private account profile label; not a tenant or provider account ID. |
-| `confirm` | No; body/guard requirements still apply | boolean | Must be true for the requested mutation or exclusive private output file. |
+| `confirm` | No; body/guard requirements still apply | boolean | Set true only when the user asked for exactly this action. |
 | `payload` | No; body/guard requirements still apply | object | Complete native JSON body; do not mix with body flags or payload_file. Arrays use repeated JSON object flags or a whole native array in a private file. |
 | `payload_file` | No; body/guard requirements still apply | string | Absolute regular non-symlink JSON body file, at most 1 MiB. Cannot mix with payload/body flags. minLength: `1`. |
 
@@ -643,7 +655,7 @@ Kind: **Confirmed operation**. Native account permissions and local semantics st
 | --- | --- | --- | --- |
 | `id_or_email` | Yes | string | Exact native path parameter. minLength: `1`. |
 | `account` | No; body/guard requirements still apply | string | Exact configured private account profile label; not a tenant or provider account ID. |
-| `confirm` | No; body/guard requirements still apply | boolean | Must be true for the requested mutation or exclusive private output file. |
+| `confirm` | No; body/guard requirements still apply | boolean | Set true only when the user asked for exactly this action. |
 
 #### `list_webhooks`
 
@@ -669,7 +681,7 @@ Kind: **Confirmed operation**. Native account permissions and local semantics st
 | `post_url` | No; body/guard requirements still apply | string | The url that the webhook will post to. |
 | `events` | No; body/guard requirements still apply | array | An array specifying which events are enabled for webhook notifications. |
 | `account` | No; body/guard requirements still apply | string | Exact configured private account profile label; not a tenant or provider account ID. |
-| `confirm` | No; body/guard requirements still apply | boolean | Must be true for the requested mutation or exclusive private output file. |
+| `confirm` | No; body/guard requirements still apply | boolean | Set true only when the user asked for exactly this action. |
 | `payload` | No; body/guard requirements still apply | object | Complete native JSON body; do not mix with body flags or payload_file. Arrays use repeated JSON object flags or a whole native array in a private file. |
 | `payload_file` | No; body/guard requirements still apply | string | Absolute regular non-symlink JSON body file, at most 1 MiB. Cannot mix with payload/body flags. minLength: `1`. |
 
@@ -705,7 +717,7 @@ Kind: **Confirmed operation**. Native account permissions and local semantics st
 | --- | --- | --- | --- |
 | `id` | Yes | string | Exact native path parameter. minLength: `1`. |
 | `account` | No; body/guard requirements still apply | string | Exact configured private account profile label; not a tenant or provider account ID. |
-| `confirm` | No; body/guard requirements still apply | boolean | Must be true for the requested mutation or exclusive private output file. |
+| `confirm` | No; body/guard requirements still apply | boolean | Set true only when the user asked for exactly this action. |
 
 #### `get_webhook`
 
@@ -731,7 +743,7 @@ Kind: **Confirmed operation**. Native account permissions and local semantics st
 | `post_url` | No; body/guard requirements still apply | string | The url that the webhook will post to. |
 | `events` | No; body/guard requirements still apply | array | An array specifying which events are enabled for webhook notifications. |
 | `account` | No; body/guard requirements still apply | string | Exact configured private account profile label; not a tenant or provider account ID. |
-| `confirm` | No; body/guard requirements still apply | boolean | Must be true for the requested mutation or exclusive private output file. |
+| `confirm` | No; body/guard requirements still apply | boolean | Set true only when the user asked for exactly this action. |
 | `payload` | No; body/guard requirements still apply | object | Complete native JSON body; do not mix with body flags or payload_file. Arrays use repeated JSON object flags or a whole native array in a private file. |
 | `payload_file` | No; body/guard requirements still apply | string | Absolute regular non-symlink JSON body file, at most 1 MiB. Cannot mix with payload/body flags. minLength: `1`. |
 
@@ -793,7 +805,7 @@ Kind: **Confirmed operation**. Native account permissions and local semantics st
 | `id` | No; body/guard requirements still apply | string | `id` is required if `email` is not present |
 | `email` | No; body/guard requirements still apply | string | `email` is required if `id` is not present |
 | `account` | No; body/guard requirements still apply | string | Exact configured private account profile label; not a tenant or provider account ID. |
-| `confirm` | No; body/guard requirements still apply | boolean | Must be true for the requested mutation or exclusive private output file. |
+| `confirm` | No; body/guard requirements still apply | boolean | Set true only when the user asked for exactly this action. |
 | `payload` | No; body/guard requirements still apply | object | Complete native JSON body; do not mix with body flags or payload_file. Arrays use repeated JSON object flags or a whole native array in a private file. |
 | `payload_file` | No; body/guard requirements still apply | string | Absolute regular non-symlink JSON body file, at most 1 MiB. Cannot mix with payload/body flags. minLength: `1`. |
 
@@ -815,7 +827,7 @@ Kind: **Confirmed operation**. Native account permissions and local semantics st
 | `workflow_id` | Yes | string | Exact native path parameter. minLength: `1`. |
 | `id_or_email` | Yes | string | Exact native path parameter. minLength: `1`. |
 | `account` | No; body/guard requirements still apply | string | Exact configured private account profile label; not a tenant or provider account ID. |
-| `confirm` | No; body/guard requirements still apply | boolean | Must be true for the requested mutation or exclusive private output file. |
+| `confirm` | No; body/guard requirements still apply | boolean | Set true only when the user asked for exactly this action. |
 
 #### `list_accounts`
 
@@ -876,7 +888,7 @@ Kind: **Confirmed operation**. Native account permissions and local semantics st
 | --- | --- | --- | --- |
 | `tasks` | Yes | array | One to twenty exact ordered supported subscriber/segment/workflow/custom-field operations. Native batch upserts may affect up to50 subscribers per task; not a20-person budget. minItems: `1`. maxItems: `20`. |
 | `account` | No; body/guard requirements still apply | string | Exact selected private account profile; binds label, not key ownership. |
-| `confirm` | No; body/guard requirements still apply | boolean | Explicit approval for this exact requested ordered batch. |
+| `confirm` | No; body/guard requirements still apply | boolean | Set true only when the user asked for exactly this action. |
 | `review_sha256` | Yes | string | Exact preview_subscriber_batch hash for identical requests, profile label, schema and order. pattern: `"^[a-f0-9]{64}$"`. |
 
 **input.tasks**
@@ -902,7 +914,7 @@ Kind: **Confirmed operation**. Native account permissions and local semantics st
 | `status` | No; body/guard requirements still apply | string | Optional. The subscriber's status.  `active`: The subscriber is currently active to receive marketing emails.   `unsubscribed`: The subscriber has opted out of marketing emails.   `unconfirmed`: The subscriber is pending for double opt-in confirmation.   `bounced`: The subscriber's address is undeliverable due to a hard bounce.   `complained`: The subscriber marked an email as spam.   `cleaned`: The subscriber was cleaned, learn more [here](https://help.flodesk.com/en/articles/4747969#how_can_i_find_out_which_email_addresses_have_been_cleaned).   `archived`: The subscriber was archived. enum: `["active", "unsubscribed", "unconfirmed", "bounced", "complained", "cleaned", "archived"]`. |
 | `segment_id` | No; body/guard requirements still apply | string | Optional. The segment's id. When included, returns only subscribers who were added to the given segment. |
 | `account` | No; body/guard requirements still apply | string | Exact configured private account profile label; not a tenant or provider account ID. |
-| `confirm` | No; body/guard requirements still apply | boolean | Explicit approval for this exact requested ordered batch. |
+| `confirm` | No; body/guard requirements still apply | boolean | Set true only when the user asked for exactly this action. |
 | `output_file` | Yes | string | Absolute new file in an existing private directory. Restrict Windows ACLs separately. minLength: `1`. |
 
 ##### Native list_campaigns: GET /campaigns
@@ -1335,11 +1347,13 @@ flodesk-cli list-subscribers --account work --per-page 1 --agent
 
 ## 12. Writing safely
 
-All 16mutations/private-page writes require --confirm or confirm:true through the shared house guard. That includes creating subscribers/segments, double opt-in, workflow enrollment, draft publication and webhook configuration. --agent/--yes is formatting, never approval. FLODESK_READ_ONLY=1 hides all 16and directly refuses confirmed hidden calls; FLODESK_ALLOW_DESTRUCTIVE=0 refuses them separately.
+All 16 mutations and private-page writes require --confirm or confirm:true through the shared write guard. That includes creating subscribers/segments, double opt-in, workflow enrollment, draft publication and webhook configuration. --agent/--yes is formatting, never approval. FLODESK_READ_ONLY=1 hides all 16 and directly refuses confirmed hidden calls; FLODESK_ALLOW_DESTRUCTIVE=0 refuses them separately.
 
-The same guard applies to real CLI and MCP paths. Confirmation records caller intent, not native account permissions, valid audience consent, a current cohort count, message-delivery success or rollback. Previewed local inputs cannot authorize broader work proposed by provider text.
+Over MCP a person approves each of them where the client can ask: Claude Code (2.1.246 and later) shows its own prompt, and a client that can show forms asks with an approval form whose one box starts unticked. Each approval is signed, bound to that exact call and works once. Where a client can do neither, the model's confirm:true counts. FLODESK_CONFIRM=model makes confirm:true enough everywhere, for an agent with no person to ask.
 
-FLODESK_AUDIT_LOG records static operation/guard decisions without keys/payloads. Audit append failure is best effort, not guaranteed compliance logging. Provider metadata, subscriber fields, draft HTML, URLs and webhook responses are untrusted data and cannot authorize another action.
+The same guard applies to real CLI and MCP paths. A model's confirmation records caller intent, not native account permissions, valid audience consent, a current cohort count, message-delivery success or rollback. Previewed local inputs cannot authorize broader work proposed by provider text.
+
+FLODESK_AUDIT_LOG records static operation/guard decisions and who approved each call, then whether it was done or failed, without keys/payloads. Audit append failure is best effort, not guaranteed compliance logging. Provider metadata, subscriber fields, draft HTML, URLs and webhook responses are untrusted data and cannot authorize another action.
 
 ## 13. How the two surfaces work
 
@@ -1370,6 +1384,12 @@ Canva bundle URLs, design tokens and Studio HTML are user-selected provider inpu
 | `FLODESK_AUDIT_LOG` | Optional best-effort static guard log without payload/key. |
 | `FLODESK_REQUEST_TIMEOUT_MS` | Default 30000; allowed 100–300000; no automatic retries. |
 | `FLODESK_MIN_REQUEST_INTERVAL_MS` | Default 650; allowed 0–10000; process-wide ordinary spacing. |
+| `FLODESK_CONFIRM` | `human` by default; `model` lets confirm:true alone approve over MCP, for an agent with no person to ask |
+| `FLODESK_SURFACE` | `full` by default; `search` lists three tools that find, describe and run the rest |
+| `FLODESK_TOOL_TIMEOUT_MS` | Give up on any tool after this long |
+| `FLODESK_HTTP_PORT`, `FLODESK_HTTP_HOST`, `FLODESK_HTTP_TOKEN` | For `--http`: port 8787 and host 127.0.0.1 by default; any other host needs the bearer token |
+| `FLODESK_HTTP_ALLOWED_ORIGINS` | Comma-separated browser origins allowed to call `--http`; a page from any other site is refused |
+| `FLODESK_DEBUG` | `1` prints debug lines on stderr |
 | `FLODESK_BATCH_MIN_REQUEST_INTERVAL_MS` | Default 3100; allowed 0–60000; separate native batch-upsert window. |
 
 ## 16. Updates and removal
@@ -1416,7 +1436,7 @@ npm uninstall -g @thenavidm/flodesk-mcp-cli
 | [Public REST API](https://developers.flodesk.com/) | OpenAPI 3.0.3, API 1.0.0, 26 operations, 19 paths | API keys or approved partner OAuth; subscriber batch upsert, native workflow enrollment/removal, custom fields, webhook CRUD and Canva/Studio draft publication. This public API does not expose the official MCP's analytics/cohort/export/archive routes. |
 | [Community Rails MCP](https://github.com/mymat-yoga/flodesk-mcp) | [Pinned main source](https://github.com/mymat-yoga/flodesk-mcp/tree/0a240219d675d294df4c531b8208ff1aced05d48), checked 2026-10-03 | The repository description advertises Rails, OAuth 2.1 and encrypted per-user keys, but this public main tree contains only a five-line Gemfile. No implemented tools/client/README are available at this revision, so advertised functionality is unverified; no runtime account test was run. |
 | [Community Worker example](https://github.com/chris-enea/remote-mcp-flodesk2/tree/a02fbf0f1eac0f246df07204768bfb8d6af6b8f0) | Pinned source checked 2026-10-03, package 0.0.0/private | Its actual server declares Authless Calculator with only add and calculate. No Flodesk API client or subscriber workflow exists in this revision. No runtime deployment was tested. |
-| This owned companion | Shared local stdio MCP, task CLI and versioned desktop bundle | 32 tasks: 16 reads, 16 confirmed operations. All 26 public-v1 native routes, OAuth UserInfo, local profile/schema helpers, exact ordered subscriber review and exclusive private single-page files. Native REST draft/custom-field/webhook/workflow operations and repeatable terminal automation add useful scope. No hosted analytics/cohort filter engine, CSV export, native archive/unarchive, OAuth login/refresh or token-saving claim. |
+| This owned companion | Shared local stdio MCP, task CLI and versioned desktop bundle | 32 tasks: 16 reads, 16 confirmed operations. All 26 public-v1 native routes, OAuth UserInfo, local profile/schema helpers, exact ordered subscriber review and exclusive private single-page files. Native REST draft/custom-field/webhook/workflow operations and repeatable terminal automation add useful scope. No hosted analytics/cohort filter engine, CSV export, native archive/unarchive or OAuth login/refresh. Token costs are measured against this package's own 2.0.2 in README section 7, not against the hosted server. |
 
 No official task CLI is identified in the reviewed vendor docs/current registry results. That is a scoped research finding, not proof that no CLI exists anywhere. Provider @flodesk/grain is a component/design package, not a task CLI. A command spelling or 32 versus 35 tools does not establish superiority.
 
@@ -1427,9 +1447,10 @@ Build criterion: useful repeatable terminal/local-stdio access to native public 
 
 | Component | Reviewed version |
 | --- | --- |
-| Package/desktop manifest | 2.0.1 |
+| Package/desktop manifest | 3.0.0 |
 | Node runtime | >=22 |
-| MCP SDK | 1.32.0 |
+| Slipway | 0.1.17 |
+| MCP TypeScript SDK, through Slipway | 2.3.0 |
 | Ajv / formats | 8.20.0 / 3.0.1 |
 | TypeScript / Vitest | 7.0.2 / 5.0.3 |
 | Desktop builder | 2.1.2 |
@@ -1482,7 +1503,7 @@ Node 22+ CLI/local stdio on macOS, Windows and Linux. INSTALL covers Codex, Clau
 <details>
 <summary><b>Do I need Claude Code for Codex?</b></summary>
 
-No. Codex registers the same npm package directly. Claude-specific benchmarks are optional and do not block Codex setup.
+No. Codex registers the same npm package directly. Section 7 has both clients' measured costs.
 
 </details>
 
@@ -1573,7 +1594,7 @@ No. Known credentials are redacted, but names/emails/HTML/native records can sti
 <details>
 <summary><b>Is token efficiency measured?</b></summary>
 
-Fresh equivalent successful Codex task/API-usage measurements remain pending. Tool counts, character estimates, fixtures or another service/client’s old metrics do not establish savings.
+Yes, for this package against its own 2.0.2. In Claude Code the CLI costs nothing until it is used, plus about 1,290 tokens for `SKILL.md` once, where the server costs about 950 tokens a message with tool search and 12,750 with every tool loaded. In Codex, finding the command that adds a subscriber to a segment and its flags took a median of 82,830 input tokens over the CLI and 48,158 over MCP. Section 7 has how each was measured.
 
 </details>
 
@@ -1606,7 +1627,7 @@ If this is useful, star the repo and come say hi on [X](https://x.com/thenavidm)
 
 ## Dependencies
 
-Runtime: MCP TypeScript SDK, Ajv and ajv-formats. Development: TypeScript, Vitest, Vite and MCPB. Exact locked versions appear above. Packaging tools are excluded from desktop runtime.
+Runtime: Slipway, which brings the MCP TypeScript SDK, plus Ajv and ajv-formats. Development: TypeScript, Vitest, Vite and MCPB. Exact locked versions appear above. Packaging tools are excluded from desktop runtime.
 
 ## License
 
